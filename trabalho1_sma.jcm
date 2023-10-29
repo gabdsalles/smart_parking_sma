@@ -1,0 +1,25 @@
+
+mas trabalho1_sma {
+
+    agent motorista: motorista.asl {
+      join: smartParking
+      focus: smartParking.parkPricing
+    }
+
+    agent gerente: gerente.asl {
+
+      focus: smartParking.parkControl
+
+    }
+
+    agent dono: dono.asl {
+      focus: smartParking.parkPricing, smartParking.parkControl
+    }
+
+    workspace smartParking {
+
+      artifact parkControl: env.ParkControl
+      artifact parkPricing: env.ParkPricing
+    }
+
+}

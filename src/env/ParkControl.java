@@ -12,7 +12,7 @@ public class ParkControl extends Artifact {
     Proposta proposta = new Proposta();
 
     void init() {
-        defineObsProperty("VagaDisponivel", false);
+        defineObsProperty("vagaDisponivel", false);
         
         Random random = new Random();
         boolean isOcupada;

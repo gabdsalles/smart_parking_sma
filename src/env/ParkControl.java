@@ -3,6 +3,9 @@ package env;
 import cartago.*;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.Random;
 
 public class ParkControl extends Artifact {
     List<Vaga> listaVagas = new ArrayList<Vaga>();
@@ -11,23 +14,51 @@ public class ParkControl extends Artifact {
     void init() {
         defineObsProperty("VagaDisponivel", false);
         
-        for (int i = 1; i < 7; i++) 
+        Random random = new Random();
+        boolean isOcupada;
+        int cobertasDisponiveis = 0;
+        int curtasDisponiveis = 0;
+        int longasDisponiveis = 0;
+        int descobertasDisponiveis = 0;
+        
+        for (int i = 1; i < 7; i++) {
             listaVagas.add(new Vaga(i, TipoVagaEnum.CURTA));
-        
-        for (int i = 7; i < 10; i++) 
-            listaVagas.add(new Vaga(i, TipoVagaEnum.LONGA));
-        
-        for (int i = 10; i < 14; i++) 
-            listaVagas.add(new Vaga(i, TipoVagaEnum.COBERTA));
-
-        for (int i = 14; i < 20; i++)
-            listaVagas.add(new Vaga(i, TipoVagaEnum.DESCOBERTA));
-
-        for (Vaga vaga : listaVagas) {
-            if (vaga.getId() == 6)
-                return;
-            vaga.ocuparVaga();
+            if (isOcupada = random.nextBoolean()) {
+                listaVagas.get(i - 1).ocuparVaga();
+            }
+            else {
+                curtasDisponiveis++;
+            }
         }
+        
+        for (int i = 7; i < 10; i++) {
+            listaVagas.add(new Vaga(i, TipoVagaEnum.LONGA));
+            if (isOcupada = random.nextBoolean()) {
+                listaVagas.get(i - 1).ocuparVaga();
+            }else
+                longasDisponiveis++;
+        }
+        
+        for (int i = 10; i < 14; i++) {
+            listaVagas.add(new Vaga(i, TipoVagaEnum.COBERTA));
+            if (isOcupada = random.nextBoolean()) {
+                listaVagas.get(i - 1).ocuparVaga();
+            } else
+                cobertasDisponiveis++;
+        }
+
+        for (int i = 14; i < 20; i++) {
+            listaVagas.add(new Vaga(i, TipoVagaEnum.DESCOBERTA));
+            if (isOcupada = random.nextBoolean()) {
+                listaVagas.get(i - 1).ocuparVaga();
+            } else
+                descobertasDisponiveis++;
+        }
+
+        defineObsProperty("curtasDisponiveis", curtasDisponiveis);
+        defineObsProperty("longasDisponiveis", longasDisponiveis);
+        defineObsProperty("cobertasDisponiveis", cobertasDisponiveis);
+        defineObsProperty("descobertasDisponiveis", descobertasDisponiveis);
     }
 
     @OPERATION
@@ -43,12 +74,10 @@ public class ParkControl extends Artifact {
     }
 
     @OPERATION
-    void reservarVaga(int idVaga) {
+    void ocuparVaga(int idVaga) {
         for (Vaga vaga : listaVagas) {
             if ((vaga.getId() == idVaga) && vaga.isDisponivel()) {
                 vaga.ocuparVaga();
-                defineObsProperty("vagaDisponivel", false);
-                defineObsProperty("idVaga", vaga.getId());
                 return;
             }
         }
@@ -59,15 +88,14 @@ public class ParkControl extends Artifact {
         for (Vaga vaga : listaVagas) {
             if ((vaga.getId() == idVaga) && !vaga.isDisponivel()) {
                 vaga.liberarVaga();
-                defineObsProperty("vagaDisponivel", true);
-                defineObsProperty("idVaga", vaga.getId());
+                defineObsProperty("motoristaSaindo", true);
                 return;
             }
         }
     }
 
     @OPERATION
-    void analisarProposta() {
+    void analisarProposta(double margemLucro) {
         Double precoProposta = proposta.getPrecoProposta();
         Double precoTabela = proposta.getPrecoTabela();
 
@@ -75,7 +103,19 @@ public class ParkControl extends Artifact {
             switch (proposta.getTipoVaga()) {
                 case "CURTA":
                     Double taxaDisponivel = verificarQuantidadeDisponivel(TipoVagaEnum.CURTA);
-                    defineObsProperty("decisaoProposta", getResultadoProposta(taxaDisponivel));
+                    defineObsProperty("decisaoProposta", getResultadoProposta(taxaDisponivel, margemLucro));
+                    break;
+                case "LONGA":
+                    taxaDisponivel = verificarQuantidadeDisponivel(TipoVagaEnum.LONGA);
+                    defineObsProperty("decisaoProposta", getResultadoProposta(taxaDisponivel, margemLucro));
+                    break;
+                case "COBERTA":
+                    taxaDisponivel = verificarQuantidadeDisponivel(TipoVagaEnum.COBERTA);
+                    defineObsProperty("decisaoProposta", getResultadoProposta(taxaDisponivel, margemLucro));
+                    break;
+                case "DESCOBERTA":
+                    taxaDisponivel = verificarQuantidadeDisponivel(TipoVagaEnum.DESCOBERTA);
+                    defineObsProperty("decisaoProposta", getResultadoProposta(taxaDisponivel, margemLucro));
                     break;
             }
         } else {
@@ -96,8 +136,8 @@ public class ParkControl extends Artifact {
 
         return (double) (quantidadeDisponivel / quantidadeVagas);
     }
-
-    boolean getResultadoProposta(Double taxaDisponivel) {
+    
+    boolean getResultadoProposta(Double taxaDisponivel, Double margemLucro) {
         Double precoProposta = proposta.getPrecoProposta();
         Double precoTabela = proposta.getPrecoTabela();
         
@@ -105,7 +145,7 @@ public class ParkControl extends Artifact {
             return true;
         } else if (taxaDisponivel >= 0.5 && precoProposta >= precoTabela) {
             return true;
-        } else if (precoProposta > precoTabela * 1.25) {
+        } else if (precoProposta > precoTabela + (precoTabela * margemLucro)) {
             return true;
         } else {
             return false;

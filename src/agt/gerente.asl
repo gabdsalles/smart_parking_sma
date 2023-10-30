@@ -8,20 +8,40 @@
 
 /* Plans */
 
-+!verificarDisponivel(TIPOVAGA) <-
-    .print("verificando disponibilidade",TIPOVAGA);
-    consultarVaga(TIPOVAGA).
++curtasDisponiveis (Qntd) <- .print("Quantidade de vagas curtas disponiveis: ", Qntd).
+
++longasDisponiveis(Qntd) <- .print("Quantidade de vagas longas disponíveis: ", Qntd).
+
++cobertasDisponiveis (Qntd) <- .print("Quantidade de vagas cobertas disponíveis: ", Qntd).
+
++descobertasDisponiveis (Qntd) <- .print("Quantidade de vagas descobertas disponíveis: ", Qntd).
 
 +vagaDisponivel (X) <-
-    .print("vaga disponivel: ", X);
+    .print("Vaga disponivel: ", X);
     .send(motorista, tell, vagaDisponivel(X)).
 
 +idVaga (X) <-
-    .print("id da vaga: ", X);
+    .print("Id da vaga: ", X);
     .send(motorista, tell, idVaga(X)).
 
-+!fazerProposta (Preco, Id, Tipo) <-
-    .print("fazendo proposta para vaga: ", Id);
-    .print("preco da proposta: ", Preco);
-    .print("tipo da vaga: ", Tipo);
++motoristaSaindo (X) <-
+    .print("Motorista saindo da vaga");
+    !repassarSaida.
+
++!repassarSaida <- .send(motorista, achieve, sairEstacionamento).
+
++!verificarDisponivel(TIPOVAGA) <-
+    .print("Verificando disponibilidade: ", TIPOVAGA);
+    consultarVaga(TIPOVAGA).
+
++!repassarProposta (Preco, Id, Tipo) <-
+    .print("Proposta para vaga id: ", Id);
+    .print("Preco da proposta: R$", Preco);
+    .print("Tipo da vaga: ", Tipo);
+    .print("Gerente está mandando a proposta para o dono.");
     .send(dono, achieve, analisarProposta(Preco, Id, Tipo)).
+
++!liberarMotorista (Id) <-
+    .print("Motorista estacionando na vaga: ", Id);
+    ocuparVaga(Id);
+    liberarVaga(Id).

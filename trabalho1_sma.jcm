@@ -1,7 +1,32 @@
 
 mas trabalho1_sma {
 
-    agent motorista: motorista.asl {
+    // agent motorista: motorista.asl {
+    //   join: smartParking
+    //   focus: smartParking.parkPricing
+    // }
+
+    agent alice: motorista.asl {
+      join: smartParking
+      focus: smartParking.parkPricing
+    }
+
+    agent bob: motorista.asl {
+      join: smartParking
+      focus: smartParking.parkPricing
+    }
+
+    agent charlie: motorista.asl {
+      join: smartParking
+      focus: smartParking.parkPricing
+    }
+
+    agent dave: motorista.asl {
+      join: smartParking
+      focus: smartParking.parkPricing
+    }
+
+    agent eve: motorista.asl {
       join: smartParking
       focus: smartParking.parkPricing
     }

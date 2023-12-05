@@ -31,7 +31,7 @@ public class ParkControl extends Artifact {
             }
         }
         
-        for (int i = 7; i < 10; i++) {
+        for (int i = 7; i < 14; i++) {
             listaVagas.add(new Vaga(i, TipoVagaEnum.LONGA));
             if (isOcupada = random.nextBoolean()) {
                 listaVagas.get(i - 1).ocuparVaga();
@@ -39,7 +39,7 @@ public class ParkControl extends Artifact {
                 longasDisponiveis++;
         }
         
-        for (int i = 10; i < 14; i++) {
+        for (int i = 14; i < 21; i++) {
             listaVagas.add(new Vaga(i, TipoVagaEnum.COBERTA));
             if (isOcupada = random.nextBoolean()) {
                 listaVagas.get(i - 1).ocuparVaga();
@@ -47,7 +47,7 @@ public class ParkControl extends Artifact {
                 cobertasDisponiveis++;
         }
 
-        for (int i = 14; i < 20; i++) {
+        for (int i = 21; i < 28; i++) {
             listaVagas.add(new Vaga(i, TipoVagaEnum.DESCOBERTA));
             if (isOcupada = random.nextBoolean()) {
                 listaVagas.get(i - 1).ocuparVaga();
@@ -62,11 +62,12 @@ public class ParkControl extends Artifact {
     }
 
     @OPERATION
-    void consultarVaga(String tipoVaga) {
+    void consultarVaga(String tipoVaga, String agente) {
         for (Vaga vaga : listaVagas) {
             if (vaga.getTipoVaga().equals(tipoVaga.toUpperCase()) && vaga.isDisponivel()) {
-                defineObsProperty("vagaDisponivel", true);
-                defineObsProperty("idVaga", vaga.getId());
+                defineObsProperty("vagaDisponivel", true, agente);
+                defineObsProperty("idVaga", vaga.getId(), agente);
+                vaga.ocuparVaga();
                 return;
             }
         }
@@ -84,18 +85,30 @@ public class ParkControl extends Artifact {
     }
 
     @OPERATION
+    void liberarVaga(int idVaga, String agente) {
+        for (Vaga vaga : listaVagas) {
+            if ((vaga.getId() == idVaga) && !vaga.isDisponivel()) {
+                vaga.liberarVaga();
+                defineObsProperty("motoristaSaindo", true, agente);
+                return;
+            }
+        }
+    }
+
+    
+    @OPERATION
     void liberarVaga(int idVaga) {
         for (Vaga vaga : listaVagas) {
             if ((vaga.getId() == idVaga) && !vaga.isDisponivel()) {
                 vaga.liberarVaga();
-                defineObsProperty("motoristaSaindo", true);
+                //defineObsProperty("motoristaSaindo", true, agente);
                 return;
             }
         }
     }
 
     @OPERATION
-    void analisarProposta(double margemLucro) {
+    void analisarProposta(double margemLucro, String agent, int idVaga) {
         Double precoProposta = proposta.getPrecoProposta();
         Double precoTabela = proposta.getPrecoTabela();
 
@@ -103,23 +116,23 @@ public class ParkControl extends Artifact {
             switch (proposta.getTipoVaga()) {
                 case "CURTA":
                     Double taxaDisponivel = verificarQuantidadeDisponivel(TipoVagaEnum.CURTA);
-                    defineObsProperty("decisaoProposta", getResultadoProposta(taxaDisponivel, margemLucro));
+                    defineObsProperty("decisaoProposta", getResultadoProposta(taxaDisponivel, margemLucro), agent, idVaga);
                     break;
                 case "LONGA":
                     taxaDisponivel = verificarQuantidadeDisponivel(TipoVagaEnum.LONGA);
-                    defineObsProperty("decisaoProposta", getResultadoProposta(taxaDisponivel, margemLucro));
+                    defineObsProperty("decisaoProposta", getResultadoProposta(taxaDisponivel, margemLucro), agent, idVaga);
                     break;
                 case "COBERTA":
                     taxaDisponivel = verificarQuantidadeDisponivel(TipoVagaEnum.COBERTA);
-                    defineObsProperty("decisaoProposta", getResultadoProposta(taxaDisponivel, margemLucro));
+                    defineObsProperty("decisaoProposta", getResultadoProposta(taxaDisponivel, margemLucro), agent, idVaga);
                     break;
                 case "DESCOBERTA":
                     taxaDisponivel = verificarQuantidadeDisponivel(TipoVagaEnum.DESCOBERTA);
-                    defineObsProperty("decisaoProposta", getResultadoProposta(taxaDisponivel, margemLucro));
+                    defineObsProperty("decisaoProposta", getResultadoProposta(taxaDisponivel, margemLucro), agent, idVaga);
                     break;
             }
         } else {
-            defineObsProperty("decisaoProposta", false);
+            defineObsProperty("decisaoProposta", false, agent, idVaga);
         }
     }
 

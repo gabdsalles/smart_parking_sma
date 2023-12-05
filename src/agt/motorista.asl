@@ -19,21 +19,21 @@ tentativas(0).
 
 +vagaDisponivel (X) <- 
     if(X == true) {
-        .print("Fazer proposta");
         !fazerProposta;
     } elif (X == false) {
         !sairEstacionamento;
     }.
 
-+!estacionar : true
-    <- defineVagaType;
++!estacionar : true <- 
+    defineVagaType;
     !checarDisponibilidade.
 
 +!checarDisponibilidade : true <-
         ?tipoVaga(X);
         .print("Verificando preco da vaga");
         consultPrice(X);
-        .send(gerente, achieve, verificarDisponivel(X)).
+        .my_name(Agent);
+        .send(gerente, achieve, verificarDisponivel(X, Agent)).
 
 +!fazerProposta <-
     .print("Fazendo proposta");
@@ -42,11 +42,13 @@ tentativas(0).
     ?precoVaga(Preco);
     ?idVaga(Id);
     ?tipoVaga(Tipo);
+    .my_name(Agent);
+    .print("Nome do agente: ", Agent);
     .print("Preco da vaga -> ", Preco);
     .print("Id da vaga -> ", Id);
     .print("Tipo da vaga -> ", Tipo);
     .print("Tentativas -> ", X);
-    .send(gerente, achieve, repassarProposta(Preco, Id, Tipo)).
+    .send(gerente, achieve, repassarProposta(Preco, Id, Tipo, Agent)).
 
 +!analisarResposta(X) <-
     ?tentativas(Tentativas);
@@ -54,7 +56,8 @@ tentativas(0).
     if(X == true) {
         .print("Proposta aceita");
         ?idVaga(Id);
-        .send(gerente, achieve, liberarMotorista(Id));
+        .my_name(Agent);
+        .send(gerente, achieve, liberarMotorista(Id, Agent));
         .print("Estacionar");
     } elif (X == false) {
         .print("Proposta recusada");
@@ -68,8 +71,8 @@ tentativas(0).
     }.
 
 +!refazerProposta <-
-    ?vagaDisponivel(X);
-    -vagaDisponivel(X);
+    //?vagaDisponivel(X);
+    //-vagaDisponivel(X);
     !checarDisponibilidade;
     ?vagaDisponivel(Y);
     

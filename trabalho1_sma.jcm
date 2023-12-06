@@ -1,11 +1,5 @@
 
 mas trabalho1_sma {
-
-    // agent motorista: motorista.asl {
-    //   join: smartParking
-    //   focus: smartParking.parkPricing
-    // }
-
     agent alice: motorista.asl {
       join: smartParking
       focus: smartParking.parkPricing
@@ -32,9 +26,7 @@ mas trabalho1_sma {
     }
 
     agent gerente: gerente.asl {
-
       focus: smartParking.parkControl
-
     }
 
     agent dono: dono.asl {
@@ -47,4 +39,22 @@ mas trabalho1_sma {
       artifact parkPricing: env.ParkPricing
     }
 
+    organisation parking: org.xml {
+      group grp_cliente: clientes {
+        responsible-for: schemeClientes
+        players:  alice r_motorista
+                  bob r_motorista
+                  charlie r_motorista
+                  dave r_motorista
+                  eve r_motorista
+      }
+      group grp_cliente: estacionamento {
+        responsible-for: schemeFuncionarios
+        players: dono r_dono
+                 gerente r_gerente
+      }
+
+      scheme schemeClientes : scheme_clientes
+      scheme schemeFuncionarios : scheme_funcionarios
+    }
 }

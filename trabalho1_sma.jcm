@@ -1,4 +1,3 @@
-
 mas trabalho1_sma {
     agent alice: motorista.asl {
       join: smartParking
@@ -48,7 +47,7 @@ mas trabalho1_sma {
                   dave r_motorista
                   eve r_motorista
       }
-      group grp_cliente: estacionamento {
+      group grp_estacionamento: estacionamento {
         responsible-for: schemeFuncionarios
         players: dono r_dono
                  gerente r_gerente

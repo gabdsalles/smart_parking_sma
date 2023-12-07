@@ -24,6 +24,26 @@ mas trabalho1_sma {
       focus: smartParking.parkPricing
     }
 
+    agent frank: motorista.asl {
+      join: smartParking
+      focus: smartParking.parkPricing
+    }
+
+    agent grace: motorista.asl {
+      join: smartParking
+      focus: smartParking.parkPricing
+    }
+
+    agent henry: motorista.asl {
+      join: smartParking
+      focus: smartParking.parkPricing
+    }
+
+    agent isabella: motorista.asl {
+      join: smartParking
+      focus: smartParking.parkPricing
+    }
+
     agent gerente: gerente.asl {
       focus: smartParking.parkControl
     }

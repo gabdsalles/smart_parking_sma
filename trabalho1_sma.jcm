@@ -44,6 +44,11 @@ mas trabalho1_sma {
       focus: smartParking.parkPricing
     }
 
+    agent jack: motorista.asl {
+      join: smartParking
+      focus: smartParking.parkPricing
+    }
+
     agent gerente: gerente.asl {
       focus: smartParking.parkControl
     }
